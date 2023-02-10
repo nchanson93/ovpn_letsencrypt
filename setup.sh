@@ -29,8 +29,8 @@ certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/ce
 
 # Create script to import certificate to OpenVPN
 echo #!/bin/bash \
-/usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/vpn.DOMAIN.com/privkey.pem" ConfigPut \
-/usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/vpn.DOMAIN.com/fullchain.pem" ConfigPut \
+/usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/$DOMAIN/privkey.pem" ConfigPut \
+/usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ConfigPut \
 /usr/local/openvpn_as/scripts/sacli start \
 >> /usr/bin/import_ovpn_cert.sh
 
@@ -38,7 +38,7 @@ echo #!/bin/bash \
 chmod +x /usr/bin/import_ovpn_cert.sh
 
 # Initial import of certificate to OpenVPN
-/usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/vpn.DOMAIN.com/privkey.pem" ConfigPut
-/usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/vpn.DOMAIN.com/fullchain.pem" ConfigPut
+/usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/$DOMAIN/privkey.pem" ConfigPut
+/usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ConfigPut
 /usr/local/openvpn_as/scripts/sacli start
 
