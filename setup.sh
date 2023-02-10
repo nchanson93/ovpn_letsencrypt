@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Collect variables
+read -p "Please enter domain e.g. vpn.domain.com: " DOMAIN
+read -p "Please enter Cloudflare token: " TOKEN
+
 # Install snap service
 apt update && apt isntall snapd
 
@@ -28,17 +32,19 @@ chmod 600 /root/.secrets/certbot/cloudflare.ini
 certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/certbot/cloudflare.ini -d $DOMAIN
 
 # Create script to import certificate to OpenVPN
-echo #!/bin/bash \
-/usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/$DOMAIN/privkey.pem" ConfigPut \
-/usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ConfigPut \
-/usr/local/openvpn_as/scripts/sacli start \
->> /usr/bin/import_ovpn_cert.sh
+echo "#!/bin/bash" >> /usr/bin/import_ovpn_cert.sh
+echo "/usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/$DOMAIN/privkey.pem" ConfigPut" >> /usr/bin/import_ovpn_cert.sh
+echo "/usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ConfigPut" >> /usr/bin/import_ovpn_cert.sh
+echo "/usr/local/openvpn_as/scripts/sacli start" >> /usr/bin/import_ovpn_cert.sh
+
 
 # Make script executable
 chmod +x /usr/bin/import_ovpn_cert.sh
+
+### Add cronjob to import certificate to OpenVPN monthly
+echo "0 1 1 * * /usr/bin/import_ovpn_cert.sh" >> /etc/cron
 
 # Initial import of certificate to OpenVPN
 /usr/local/openvpn_as/scripts/sacli --key "cs.priv_key" --value_file "/etc/letsencrypt/live/$DOMAIN/privkey.pem" ConfigPut
 /usr/local/openvpn_as/scripts/sacli --key "cs.cert" --value_file "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ConfigPut
 /usr/local/openvpn_as/scripts/sacli start
-
