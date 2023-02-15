@@ -5,10 +5,10 @@ read -p "Please enter domain e.g. vpn.domain.com: " DOMAIN
 read -p "Please enter Cloudflare token: " TOKEN
 
 # Install snap service
-apt update && apt isntall snapd
+apt update && apt install snapd -y
 
 # Make sure snap is up to date
-snap isntall core; snap refresh core
+snap install core; snap refresh core
 
 # Install certbot
 snap install --classic certbot
@@ -23,6 +23,7 @@ snap set certbot trust-plugin-with-root=ok
 snap install certbot-dns-cloudflare
 
 # Create credential file 
+mkdir -p /root/.secrets/certbot
 echo "dns_cloudflare_api_token = $TOKEN" >> /root/.secrets/certbot/cloudflare.ini
 
 # Set credential file permisisons
